@@ -3,11 +3,15 @@ import os
 import pandas as pd
 import numpy as np
 import rampwf as rw
+from sklearn.model_selection import train_test_split
 from datetime import timedelta
 
-problem_title = 'Fake news: classify statements of public figures'
-_target_column_name = 'truth'
-_prediction_label_names = [0, 1, 2, 3, 4, 5]
+problem_title = 'Prediction of the filling of Velib stations'
+_target_column_name = 'filling'
+_prediction_label_names = [0, 1, 2] 
+#'0' if the number of bike available is less than min(2, 10% number of docks) 
+#'2' if the number of dock available is less than min(1, 5% number of docks)
+#'1' is station filled okay
 # A type (class) which will be used to create wrapper objects for y_pred
 Predictions = rw.prediction_types.make_multiclass(
     label_names=_prediction_label_names)
@@ -15,32 +19,14 @@ Predictions = rw.prediction_types.make_multiclass(
 # An object implementing the workflow
 workflow = rw.workflows.FeatureExtractorClassifier()
 
-soft_score_matrix = np.array([
-    [1, 0.8, 0, 0, 0, 0],
-    [0.4, 1, 0.4, 0, 0, 0],
-    [0, 0.4, 1, 0.4, 0, 0],
-    [0, 0, 0.4, 1, 0.4, 0],
-    [0, 0, 0, 0.4, 1, 0.4],
-    [0, 0, 0, 0, 0.8, 1],
-])
+#no soft score matrix
 
-true_false_score_matrix = np.array([
-    [1, 1, 1, 0, 0, 0],
-    [1, 1, 1, 0, 0, 0],
-    [1, 1, 1, 0, 0, 0],
-    [0, 0, 0, 1, 1, 1],
-    [0, 0, 0, 1, 1, 1],
-    [0, 0, 0, 1, 1, 1],
-])
+#no tf score matrix
 
 score_types = [
-    rw.score_types.SoftAccuracy(
-        name='sacc', score_matrix=soft_score_matrix, precision=3),
     rw.score_types.Accuracy(name='acc', precision=3),
-    rw.score_types.SoftAccuracy(
-        name='tfacc', score_matrix=true_false_score_matrix, precision=3),
 ]
-
+#choice of score_type : Accuracy
 
 def get_cv(X, y):
     """Slice folds by equal date intervals."""
